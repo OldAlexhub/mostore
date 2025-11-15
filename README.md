@@ -1,4 +1,67 @@
-# Getting Started with Create React App
+# M&O Store — Client (Storefront)
+
+This is the React-based storefront for the M&O Store demo. It provides the customer-facing shopping experience (product listing, cart, checkout) and integrates with the server API for auth, orders and promotions.
+
+Quick start
+
+1. Install dependencies and start the dev server:
+
+```bash
+cd "c:/Users/moham/Desktop/MO Store/client"
+npm install
+npm start
+```
+
+2. The dev server runs on `http://localhost:3000` by default. The project has a `proxy` configured in `package.json` pointing to `http://localhost:3001` (server). During development the client will forward unknown requests to the API.
+
+Build
+
+```bash
+npm run build
+```
+
+The static build output will be in `build/`. You can serve the build folder with any static file host or integrate it into the `server/public/` folder for production.
+
+Environment and API
+
+- The client expects the API to be available under the same origin when built for production, or proxied in development. If your API runs on a different origin in development, update the `proxy` field in `package.json` or configure axios base URL in `src/api.js`.
+- The server uses cookie-based auth and a CSRF double-submit pattern. The client must:
+  1. Send credentials with API requests (the provided `api` helper sets `withCredentials`).
+  2. Call `GET /api/auth/csrf` or read the `csrf` cookie before any mutating request, and include `X-CSRF-Token` header matching that cookie for POST/PUT/DELETE requests.
+
+Features
+
+- Product listing and details
+- Cart with quantity updates and persisted items
+- Coupon entry on the Cart page: calls `/api/promotions/validate?code=CODE&total=...` to preview discount and then sends `couponCode` when creating an order
+- Checkout creates an order via `POST /api/orders` (server re-validates coupons server-side)
+
+Admin integration
+
+- The admin SPA (separate app under `admin/`) uses the same API. Coupons created/edited in the Admin Promotions page are available immediately to the storefront via the `/api/promotions/validate` endpoint.
+
+Testing and debugging
+
+- Open browser devtools Network tab to verify cookies and CSRF header are exchanged.
+- If you see `403 Missing CSRF cookie` ensure the client called `/api/auth/csrf` and that cookies are allowed (CORS `credentials: true`).
+
+Deployment notes
+
+- When deploying the client and server to different origins, ensure the server `CLIENT_ORIGIN` includes the client's origin and that cookies are configured with `SameSite` and `secure` flags appropriate for your deployment.
+- For production you can host the built client in the server `public/` folder, or on a static host (Netlify, Vercel, S3+CloudFront) and configure CORS accordingly.
+
+Useful commands
+
+- Start dev server: `npm start`
+- Build for production: `npm run build`
+- Run tests: `npm test` (uses react-scripts test runner)
+
+If you want, I can:
+- Add a small `README_ADMIN.md` showing how the storefront and admin interact for coupon flows.
+- Add axios base URL configuration for explicit API origins (instead of relying on `proxy`).
+- Create a minimal e2e test script to validate the coupon flow (validate then checkout).
+
+Last updated: 2025-11-15# Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

@@ -1,0 +1,81 @@
+:root{
+  --brand:#6a3cb8; /* distinctive purple */
+  --brand-dark:#572aa0;
+  --brand-contrast:#ffffff;
+  --muted:#6c757d;
+}
+
+/* header */
+.app-topbar{
+  background: var(--brand);
+  color: var(--brand-contrast);
+}
+.app-topbar .navbar-brand{ color: var(--brand-contrast) !important; }
+
+.app-search {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: none;
+  width: 100%;
+}
+
+.btn-brand{
+  background: var(--brand);
+  color: var(--brand-contrast);
+  border:none;
+}
+
+.btn-brand-outline{
+  background: transparent;
+  color: var(--brand);
+  border:1px solid var(--brand);
+}
+
+.hero-landing{
+  background: linear-gradient(90deg, rgba(106,60,184,0.08), rgba(106,60,184,0.03));
+  padding: 28px 16px;
+  border-radius: 6px;
+}
+
+.category-strip{
+  overflow:auto;
+  white-space:nowrap;
+  padding:8px 0;
+}
+.category-strip a{ display:inline-block; margin-inline:6px; padding:6px 12px; border-radius:20px; background:#fff; border:1px solid rgba(0,0,0,0.06); color:var(--muted); }
+
+.auth-card{ border:1px solid rgba(0,0,0,0.06); border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.04); overflow:hidden }
+.auth-card .card-header{ background:var(--brand); color:var(--brand-contrast); padding:14px }
+.auth-card .card-body{ padding:18px }
+
+@media (min-width: 768px){
+  .app-search { width: 520px; }
+}
+
+/* Footer compact styles */
+.app-footer{ padding:6px 0; }
+.app-footer .container{ max-width:1140px; }
+.app-footer a { color: rgba(255,255,255,0.85); }
+.app-footer .text-muted { color: rgba(255,255,255,0.65); }
+
+@media (max-width: 575px){
+  .app-footer{ padding:8px 0; }
+  .app-footer a, .app-footer .text-muted { font-size:12px; }
+}
+
+/* Small screen header layout adjustments */
+@media (max-width: 767px) {
+  .app-topbar .container { display:flex; flex-direction:column; gap:8px; align-items:stretch; }
+  .app-topbar .d-flex.align-items-center { min-width: 0 !important; }
+  .app-topbar .navbar-brand { font-size:18px; }
+  .app-topbar form.d-flex { order: 3; width:100%; }
+  .app-topbar .me-3, .app-topbar .ms-3 { margin:0 !important; }
+  .app-search { width:100%; }
+  .app-topbar a[aria-label="Cart"] { margin-left: 0.5rem; }
+}
+
+/* Medium screens: make header elements fit */
+@media (min-width: 576px) and (max-width: 991px) {
+  .app-topbar .container { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .app-search { width: 360px; }
+}

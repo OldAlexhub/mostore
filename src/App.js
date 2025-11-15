@@ -1,24 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import AnnouncementBanner from './components/AnnouncementBanner';
+import Footer from './components/Footer';
+import Header from './components/Header';
+import RequireAuth from './components/RequireAuth';
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
+import { ToastProvider } from './context/ToastContext';
+import Cart from './pages/Cart';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Products from './pages/Products';
+import Profile from './pages/Profile';
+import Register from './pages/Register';
+import './styles/brand.css';
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <CartProvider>
+        <ToastProvider>
+          <BrowserRouter>
+            <Header />
+            <AnnouncementBanner />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/cart" element={<RequireAuth><Cart /></RequireAuth>} />
+              <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Routes>
+            <Footer />
+          </BrowserRouter>
+        </ToastProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 
