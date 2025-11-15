@@ -8,20 +8,8 @@ const api = axios.create({
 });
 
 // attach CSRF header for state-changing requests using double-submit token from cookie
-function getCookie(name) {
-  if (typeof document === 'undefined') return null;
-  const m = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return m ? decodeURIComponent(m[2]) : null;
-}
-
-api.interceptors.request.use(config => {
-  const method = (config.method || '').toLowerCase();
-  if (['post','put','delete','patch'].includes(method)) {
-    const csrf = getCookie('csrf');
-    if (csrf) config.headers['X-CSRF-Token'] = csrf;
-  }
-  return config;
-});
+// no CSRF double-submit in use: keep credentials but do not attach X-CSRF-Token header
+api.interceptors.request.use(config => config);
 
 // Response interceptor: on 401 try to refresh once then retry request
 api.interceptors.response.use(undefined, async (error) => {

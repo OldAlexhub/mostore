@@ -25,9 +25,8 @@ The static build output will be in `build/`. You can serve the build folder with
 Environment and API
 
 - The client expects the API to be available under the same origin when built for production, or proxied in development. If your API runs on a different origin in development, update the `proxy` field in `package.json` or configure axios base URL in `src/api.js`.
-- The server uses cookie-based auth and a CSRF double-submit pattern. The client must:
-  1. Send credentials with API requests (the provided `api` helper sets `withCredentials`).
-  2. Call `GET /api/auth/csrf` or read the `csrf` cookie before any mutating request, and include `X-CSRF-Token` header matching that cookie for POST/PUT/DELETE requests.
+- The server uses cookie-based auth. The client must send credentials with API requests (the provided `api` helper sets `withCredentials`).
+  Note: CSRF double-submit was removed from the server; the API no longer issues a non-httpOnly `csrf` cookie nor requires an `X-CSRF-Token` header.
 
 Features
 
@@ -42,8 +41,7 @@ Admin integration
 
 Testing and debugging
 
-- Open browser devtools Network tab to verify cookies and CSRF header are exchanged.
-- If you see `403 Missing CSRF cookie` ensure the client called `/api/auth/csrf` and that cookies are allowed (CORS `credentials: true`).
+- Open browser devtools Network tab to verify cookies are exchanged and requests include credentials.
 
 Deployment notes
 

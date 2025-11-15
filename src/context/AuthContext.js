@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     const res = await api.post('/api/users/login', { username, password });
-    // server sets token+csrf cookies. If the response includes user info,
+      // server sets token and refresh cookies. If the response includes user info,
     // update context immediately so UI reflects login without waiting for fetch.
     if (res.data && res.data.user) setUser(res.data.user);
     // Do not call fetchMe() immediately — some browsers may not have stored
