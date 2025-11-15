@@ -50,6 +50,20 @@ Deployment notes
 - When deploying the client and server to different origins, ensure the server `CLIENT_ORIGIN` includes the client's origin and that cookies are configured with `SameSite` and `secure` flags appropriate for your deployment.
 - For production you can host the built client in the server `public/` folder, or on a static host (Netlify, Vercel, S3+CloudFront) and configure CORS accordingly.
 
+Docker (optional)
+
+There is a `Dockerfile` and `nginx.conf` included which will build the app and serve it with nginx. Building the Docker image will run `npm run build` inside the image — you asked not to build locally, so this is an easy way to produce a production image without building files locally.
+
+Example build and run:
+
+```bash
+cd "c:/Users/moham/Desktop/MO Store/client"
+docker build -t mo-store-client --build-arg REACT_APP_API_URL="https://api.yourdomain.com" .
+docker run -p 8080:80 mo-store-client
+```
+
+Open `http://localhost:8080` to view the site.
+
 Useful commands
 
 - Start dev server: `npm start`
