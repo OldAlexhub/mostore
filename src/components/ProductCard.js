@@ -1,39 +1,59 @@
-
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { useStore } from '../context/StoreContext';
 import { useToast } from '../context/ToastContext';
 
 const ProductCard = ({ product }) => {
   const { add, decrease } = useCart();
-  const { add: addToast } = useToast();
+  const toast = useToast();
+  const { discount } = useStore();
   const [showAdded, setShowAdded] = useState(false);
+
+  const isGeneralDiscount = discount && discount.active && discount.type === 'general' && discount.value > 0;
+  const discountedPrice = isGeneralDiscount ? Math.max(0, (product.Sell || 0) * (1 - discount.value / 100)) : product.Sell;
 
   const handleAdd = () => {
     add(product, 1);
-    // show small animation
     setShowAdded(true);
     setTimeout(() => setShowAdded(false), 900);
-    addToast(`${product.Name} أضيفت إلى السلة`, { undo: () => decrease(product._id, 1), undoLabel: 'تراجع' });
+    if (toast && typeof toast.add === 'function') {
+      toast.add(`${product.Name} اتضاف للسلة`, { undo: () => decrease(product._id, 1), undoLabel: 'تراجع' });
+    }
   };
 
+  const img = product.imageUrl || product.image || product.images?.[0] || product.productDetails?.imageUrl || '';
+
   return (
-    <div className="card h-100 shadow-sm" style={{position:'relative', overflow:'visible'}}>
-      <div style={{height:140,background:'#f3f4f6'}} className="d-flex align-items-center justify-content-center">
-        <span className="text-muted">صورة</span>
+    <div className="card h-100 shadow-sm" style={{ position: 'relative', overflow: 'visible' }}>
+      <div style={{ height: 140, background: '#f3f4f6' }} className="d-flex align-items-center justify-content-center">
+        {img ? (
+          <img src={img} alt={product.Name || ''} style={{ maxHeight: 140, maxWidth: '100%', objectFit: 'contain' }} />
+        ) : (
+          <span className="text-muted">صورة</span>
+        )}
       </div>
       <div className="card-body p-2">
-        <h6 className="card-title mb-1" style={{fontSize:14}}>{product.Name}</h6>
+        <h6 className="card-title mb-1" style={{ fontSize: 14 }}>{product.Name}</h6>
         <div className="d-flex justify-content-between align-items-center">
-          <div className="text-muted">ج.م {product.Sell}</div>
-          <button className="btn btn-sm btn-outline-primary" onClick={handleAdd}>أضف إلى السلة</button>
+          <div className="text-muted">
+            {isGeneralDiscount ? (
+              <>
+                <del style={{ marginLeft: 6 }}>ج.م {product.Sell}</del>
+                <strong style={{ color: '#16a34a' }}>ج.م {discountedPrice.toFixed(0)}</strong>
+              </>
+            ) : (
+              <>ج.م {product.Sell}</>
+            )}
+          </div>
+          <button className="btn btn-sm btn-outline-primary" onClick={handleAdd}>أضف للسلة</button>
         </div>
       </div>
 
       {showAdded && (
-        <div style={{position:'absolute', top:8, left:8, transform:'translateY(-50%)', pointerEvents:'none'}}>
-          <div style={{background:'#198754', color:'#fff', padding:'6px 10px', borderRadius:20, boxShadow:'0 6px 18px rgba(0,0,0,0.12)', display:'flex', alignItems:'center', gap:8, animation:'mo-pop 600ms ease-out'}}>
-            <span style={{fontSize:14}}>✓</span>
-            <span style={{fontSize:13}}>تمت الإضافة</span>
+        <div style={{ position: 'absolute', top: 8, left: 8, transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+          <div style={{ background: '#198754', color: '#fff', padding: '6px 10px', borderRadius: 20, boxShadow: '0 6px 18px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', gap: 8, animation: 'mo-pop 600ms ease-out' }}>
+            <span style={{ fontSize: 13 }}>✓</span>
+            <span style={{ fontSize: 13 }}>اتضاف للسلة</span>
           </div>
         </div>
       )}
@@ -41,6 +61,6 @@ const ProductCard = ({ product }) => {
       <style>{`@keyframes mo-pop { 0% { transform: translateY(-10px) scale(0.8); opacity:0 } 60% { transform: translateY(0) scale(1.05); opacity:1 } 100% { transform: translateY(0) scale(1); } }`}</style>
     </div>
   );
-}
+};
 
 export default ProductCard;

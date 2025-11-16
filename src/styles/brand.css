@@ -79,3 +79,115 @@
   .app-topbar .container { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .app-search { width: 360px; }
 }
+
+/* Products page */
+.products-page[dir="rtl"]{
+  direction: rtl;
+  text-align: right;
+}
+.products-page .products-hero{
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.24), transparent 50%), linear-gradient(135deg, rgba(32,21,49,0.9), rgba(106,60,184,0.9));
+  border:none;
+  color:#fff;
+  box-shadow:0 18px 40px rgba(0,0,0,0.18);
+}
+.products-page .hero-tag{
+  letter-spacing:2px;
+  color:rgba(255,255,255,0.75);
+}
+.products-page .hero-pills .hero-pill{
+  border-radius:999px;
+  padding-inline:14px;
+  font-weight:600;
+}
+.products-page .hero-pills .btn-outline-light{
+  border-color:rgba(255,255,255,0.6);
+  color:#fff;
+}
+.products-page .hero-highlights{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:12px;
+  margin-top:24px;
+}
+.hero-highlight-card{
+  background:rgba(255,255,255,0.12);
+  border-radius:12px;
+  padding:16px;
+  backdrop-filter: blur(8px);
+}
+.hero-highlight-value{
+  font-size:26px;
+  font-weight:700;
+}
+.hero-highlight-label{
+  font-size:14px;
+  color:rgba(255,255,255,0.75);
+}
+.products-toolbar .toolbar-feature{
+  background:rgba(106,60,184,0.08);
+  color:var(--brand);
+  font-weight:600;
+  padding:8px 14px;
+}
+.products-toolbar .view-toggle{
+  min-width:90px;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  align-items:center;
+}
+.products-filter-option{
+  padding:6px 8px;
+  border:1px solid rgba(0,0,0,0.05);
+  border-radius:8px;
+}
+.products-filter-option input{
+  margin-top:0;
+}
+.filter-block{
+  border-bottom:1px solid rgba(0,0,0,0.05);
+  padding-block:10px;
+}
+.filter-block:last-child{
+  border-bottom:none;
+}
+.filter-block summary{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  list-style:none;
+  cursor:pointer;
+}
+.filter-block summary::-webkit-details-marker{
+  display:none;
+}
+.filter-block .chevron{
+  font-size:14px;
+  transition:transform 0.2s ease;
+}
+.filter-block[open] .chevron{
+  transform:rotate(180deg);
+}
+.filter-options{
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.products-list-thumb{
+  width:120px;
+  height:80px;
+}
+.products-compact-thumb{
+  height:80px;
+}
+.active-filters .btn-link{
+  color:var(--brand);
+}
+@media (min-width: 1200px){
+  .products-filters{
+    position: sticky;
+    top: 24px;
+  }
+}

@@ -60,11 +60,37 @@ const Home = () => {
 
   const navigate = useNavigate();
   // featured categories shown on home that should open /products with that filter
-  const featured = ['الكل', 'أوشحة وحجاب', 'اكسسوارات', 'ملابس', 'منتجات التجميل'];
-  const goToFeatured = (label) => {
-    if (!label || label === 'الكل') return navigate('/products');
+  const featured = [
+    { label: 'الكل', query: '' },
+    { label: 'أوشحة وحجاب', query: 'Scarves' },
+    { label: 'اكسسوارات', query: 'Accessories' },
+    { label: 'ملابس', query: 'Clothes' },
+    { label: 'منتجات التجميل', query: 'Beauty' }
+  ];
+  const categoryMeta = (() => {
+    const blocklist = new Set(featured.map(f => f.label));
+    const seen = new Set();
+    const next = [];
+    const labelToRaw = new Map();
+    cats.forEach((cat) => {
+      const label = translateCategory(cat);
+      if (!label) return;
+      if (!labelToRaw.has(label)) labelToRaw.set(label, cat);
+      if (blocklist.has(label)) return;
+      if (seen.has(label)) return;
+      seen.add(label);
+      next.push({ raw: cat, label });
+    });
+    return { filtered: next, labelToRaw };
+  })();
+  const filteredCats = categoryMeta.filtered;
+  const labelToRaw = categoryMeta.labelToRaw;
+  const goToFeatured = ({ label, query }) => {
+    if (label === 'الكل') return navigate('/products');
+    const resolved = labelToRaw.get(label) || query || '';
+    if (!resolved) return navigate('/products');
     // prefer `Category` query param; Products page accepts `cat` or `Category`
-    navigate(`/products?Category=${encodeURIComponent(label)}`);
+    navigate(`/products?Category=${encodeURIComponent(resolved)}`);
   };
 
   // fetch announcement (if any)
@@ -137,18 +163,15 @@ const Home = () => {
 
       <div className="mb-3">
         <div className="d-flex gap-2 flex-wrap mb-2">
-          {featured.map(f => (
-            <button key={f} type="button" className="btn btn-sm btn-outline-secondary" onClick={() => goToFeatured(f)}>{f}</button>
+          {featured.map(item => (
+            <button key={item.label} type="button" className="btn btn-sm btn-outline-secondary" onClick={() => goToFeatured(item)}>{item.label}</button>
           ))}
         </div>
         <nav className="category-strip" aria-label="Categories">
           <Link to="/products">الكل</Link>
-          {cats.map(c => {
-            const label = translateCategory(c);
-            return (
-              <Link key={c} to={`/products?cat=${encodeURIComponent(c)}`}>{label}</Link>
-            );
-          })}
+          {filteredCats.map(({ raw, label }) => (
+            <Link key={raw || label} to={`/products?Category=${encodeURIComponent(raw || label)}`}>{label}</Link>
+          ))}
         </nav>
       </div>
 
