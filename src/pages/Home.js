@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
 import ProductCard from '../components/ProductCard';
+import SEO from '../components/SEO';
 import bannerImg from '../images/banner.png';
 
 const Home = () => {
@@ -117,7 +118,9 @@ const Home = () => {
   }, []);
 
   return (
-    <main className="container py-4">
+    <>
+      <SEO title="الرئيسية" description="MO Store - منتجات مميزة، شحن لكل المحافظات، استرجاع خلال 14 يوم." />
+      <main className="container py-4">
       <div className="hero-landing mb-3">
           {/* Announcement area (only render if announcement present and not dismissed) */}
           {announcement && !dismissed && (
@@ -196,6 +199,7 @@ const Home = () => {
         </div>
       </section>
     </main>
+    </>
   );
 };
 

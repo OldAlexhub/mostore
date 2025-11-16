@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../api';
 import MiniCart from '../components/MiniCart';
 import ProductCard from '../components/ProductCard';
+import SEO from '../components/SEO';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { useToast } from '../context/ToastContext';
@@ -244,8 +245,31 @@ const Products = () => {
   const totalCount = formatArabicNumber(total || products.length);
   const summaryLabel = q ? `نتايج عن "${q}"` : 'كل القطع المتاحة دلوقتي';
 
+  // JSON-LD product list (first N items) for better SEO when crawled
+  const buildProductsJsonLd = (items = []) => {
+    const products = (items || []).slice(0, 10).map(p => ({
+      '@type': 'Product',
+      name: p.Name || '',
+      image: p.imageUrl || p.image || (p.images && p.images[0]) || p.productDetails?.imageUrl || undefined,
+      sku: p.Number || p.number || p._id || undefined,
+      offers: p.Sell ? { '@type': 'Offer', priceCurrency: 'EGP', price: String(p.Sell), availability: 'http://schema.org/InStock' } : undefined
+    }));
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: products.map((prod, i) => ({ '@type': 'ListItem', position: i + 1, item: prod }))
+    };
+  };
+
   return (
-    <main className="container py-4 products-page" dir="rtl">
+    <>
+      <SEO
+        title={q ? `نتايج البحث: ${q}` : 'المنتجات'}
+        description={`تصفّح ${total || products.length} من منتجات MO Store. فلتر بحث متقدم، شحن لكل المحافظات، واسترجاع خلال ١٤ يوم.`}
+        canonical={typeof window !== 'undefined' ? window.location.href : undefined}
+        jsonLd={buildProductsJsonLd(products)}
+      />
+      <main className="container py-4 products-page" dir="rtl">
 
       <div className="products-toolbar card border-0 shadow-sm mb-4">
         <div className="card-body">
@@ -497,6 +521,7 @@ const Products = () => {
         </section>
       </div>
     </main>
+    </>
   );
 };
 
