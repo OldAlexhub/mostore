@@ -20,7 +20,7 @@ const Products = () => {
   const [total, setTotal] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
-  const [limit, setLimit] = useState(parseInt(new URLSearchParams(location.search).get('limit') || '24', 10));
+  const [, setLimit] = useState(parseInt(new URLSearchParams(location.search).get('limit') || '24', 10));
   const { add } = useCart();
   const toast = useToast();
   const { discount } = useStore();
@@ -115,7 +115,7 @@ const Products = () => {
       .finally(() => { if (mounted) setLoading(false); });
 
     return () => { mounted = false; };
-  }, [q, categoryKey, subcategoryKey, materialKey, seasonKey, styleKey, sortParam, pageParam, limitParam]);
+  }, [q, categoryKey, subcategoryKey, materialKey, seasonKey, styleKey, sortParam, pageParam, limitParam, categoryArr, subcategoryArr, materialArr, seasonArr, styleArr]);
 
   useEffect(() => {
     let mounted = true;
@@ -221,19 +221,7 @@ const Products = () => {
     updateQueryArray(key, next);
   };
 
-  const scrollProductList = () => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }
-  };
-
-  const heroHighlights = [
-    { label: 'ستايلات جاهزة للشحن', value: formatArabicNumber(total || products.length || 0) },
-    { label: 'وصل جديد الأسبوع ده', value: formatArabicNumber(Math.min(products.length || 0, 24)) },
-    { label: 'توصيل جوا مصر', value: '٢-٤ أيام' }
-  ];
-
-  const quickCategoryPills = (filterOptions.categories || []).filter(Boolean).slice(0, 5);
+  // removed unused helpers (scrollProductList, heroHighlights, quickCategoryPills)
   const featureBadges = ['شحن لكل المحافظات', 'استرجاع خلال ١٤ يوم', 'دفع عند الاستلام'];
   const viewOptions = [
     { id: 'grid', label: 'شبكي', caption: 'نظرة سريعة' },

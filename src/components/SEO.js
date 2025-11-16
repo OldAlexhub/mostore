@@ -22,13 +22,14 @@ const SEO = ({ title, description, canonical, image, jsonLd, noindex = false }) 
     const prevTitle = document.title;
     document.title = finalTitle;
 
-    const viewport = ensureMeta('name', 'viewport', 'width=device-width, initial-scale=1');
-    const desc = ensureMeta('name', 'description', description || DEFAULT_DESCRIPTION);
-    const ogTitle = ensureMeta('property', 'og:title', finalTitle);
-    const ogDesc = ensureMeta('property', 'og:description', description || DEFAULT_DESCRIPTION);
-    const ogType = ensureMeta('property', 'og:type', 'website');
+    // set common meta tags (no need to keep references for most of them)
+    ensureMeta('name', 'viewport', 'width=device-width, initial-scale=1');
+    ensureMeta('name', 'description', description || DEFAULT_DESCRIPTION);
+    ensureMeta('property', 'og:title', finalTitle);
+    ensureMeta('property', 'og:description', description || DEFAULT_DESCRIPTION);
+    ensureMeta('property', 'og:type', 'website');
     const ogImage = image ? ensureMeta('property', 'og:image', image) : null;
-    const twitter = ensureMeta('name', 'twitter:card', image ? 'summary_large_image' : 'summary');
+    ensureMeta('name', 'twitter:card', image ? 'summary_large_image' : 'summary');
     const robots = noindex ? ensureMeta('name', 'robots', 'noindex,nofollow') : null;
 
     // canonical link
