@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import api from '../api';
 
 const fetchAnnouncements = async () => {
   try {
-    const res = await fetch('/api/announcements', { credentials: 'include' });
-    if (!res.ok) return [];
-    return await res.json();
+    const res = await api.get('/api/announcements');
+    const anns = Array.isArray(res.data) ? res.data : [];
+    return anns;
   } catch {
     return [];
   }

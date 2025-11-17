@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../api';
 import MiniCart from '../components/MiniCart';
@@ -8,6 +8,43 @@ import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { useToast } from '../context/ToastContext';
 import { formatEGP } from '../utils/formatCurrency';
+
+const csvToArray = (value) => (value ? value.toString().split(',').map(v => v.trim()).filter(Boolean) : []);
+
+const buildFilterState = (search) => {
+  const params = new URLSearchParams(search);
+  const q = params.get('q') || '';
+  const legacyCat = params.get('cat') || '';
+  const sortParam = params.get('sort') || '';
+  const pageParam = parseInt(params.get('page') || '1', 10);
+  const limitParam = parseInt(params.get('limit') || '24', 10);
+
+  const getFilterArray = (key) => {
+    const repeated = params.getAll(key);
+    if (repeated.length > 1) return repeated.filter(Boolean);
+    const single = params.get(key);
+    return csvToArray(single || '');
+  };
+
+  let categoryArr = getFilterArray('Category');
+  if (!categoryArr.length && legacyCat) categoryArr = csvToArray(legacyCat);
+  const subcategoryArr = getFilterArray('Subcategory');
+  const materialArr = getFilterArray('Material');
+  const seasonArr = getFilterArray('Season');
+  const styleArr = getFilterArray('Style');
+
+  return {
+    q,
+    sortParam,
+    pageParam,
+    limitParam,
+    categoryArr,
+    subcategoryArr,
+    materialArr,
+    seasonArr,
+    styleArr
+  };
+};
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -25,28 +62,18 @@ const Products = () => {
   const toast = useToast();
   const { discount } = useStore();
 
-  const params = new URLSearchParams(location.search);
-  const q = params.get('q') || '';
-  const legacyCat = params.get('cat') || '';
-  const sortParam = params.get('sort') || '';
-
-  const pageParam = parseInt(params.get('page') || '1', 10);
-  const limitParam = parseInt(params.get('limit') || '24', 10);
-
-  const csvToArray = (value) => (value ? value.toString().split(',').map(v => v.trim()).filter(Boolean) : []);
-  const getFilterArray = (key) => {
-    const repeated = params.getAll(key);
-    if (repeated.length > 1) return repeated.filter(Boolean);
-    const single = params.get(key);
-    return csvToArray(single || '');
-  };
-
-  let categoryArr = getFilterArray('Category');
-  if (!categoryArr.length && legacyCat) categoryArr = csvToArray(legacyCat);
-  const subcategoryArr = getFilterArray('Subcategory');
-  const materialArr = getFilterArray('Material');
-  const seasonArr = getFilterArray('Season');
-  const styleArr = getFilterArray('Style');
+  const filterState = useMemo(() => buildFilterState(location.search), [location.search]);
+  const {
+    q,
+    sortParam,
+    pageParam,
+    limitParam,
+    categoryArr,
+    subcategoryArr,
+    materialArr,
+    seasonArr,
+    styleArr
+  } = filterState;
 
   const categoryKey = categoryArr.join('|');
   const subcategoryKey = subcategoryArr.join('|');
