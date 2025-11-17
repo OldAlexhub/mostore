@@ -45,10 +45,6 @@ const Home = () => {
   const [gems, setGems] = useState([]);
   const [cats, setCats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [announcement, setAnnouncement] = useState(null);
-  const [dismissed, setDismissed] = useState(() => {
-    try { return !!localStorage.getItem('announcementDismissed'); } catch { return false; }
-  });
 
   useEffect(() => {
     let mounted = true;
@@ -94,15 +90,6 @@ const Home = () => {
     navigate(`/products?Category=${encodeURIComponent(resolved)}`);
   };
 
-  // fetch announcement (if any)
-  useEffect(()=>{
-    let mounted = true;
-    api.get('/api/announcements')
-      .then(res=>{ if (!mounted) return; setAnnouncement(res.data || null); })
-      .catch(()=>{})
-    return ()=> mounted = false;
-  },[]);
-
   // Fetch distinct Category values to populate the category strip
   useEffect(() => {
     let mounted = true;
@@ -122,17 +109,6 @@ const Home = () => {
       <SEO title="الرئيسية" description="MO Store - منتجات مميزة، شحن لكل المحافظات، استرجاع خلال 14 يوم." />
       <main className="container py-4">
       <div className="hero-landing mb-3">
-          {/* Announcement area (only render if announcement present and not dismissed) */}
-          {announcement && !dismissed && (
-            <div className="mb-3">
-              <div className="alert alert-warning d-flex justify-content-between align-items-center mb-0" role="alert" style={{borderRadius:8}}>
-                <div>
-                  {announcement.href ? <a href={announcement.href} className="text-decoration-none text-dark">{announcement.text}</a> : <span>{announcement.text}</span>}
-                </div>
-                <button className="btn btn-sm btn-light" onClick={()=>{ setDismissed(true); try{ localStorage.setItem('announcementDismissed','1'); }catch{} }}>✕</button>
-              </div>
-            </div>
-          )}
         <div className="row g-0 align-items-center">
           {/* image column: shown on right for RTL on md+ */}
           <div className="col-12 col-md-6 order-md-2">
