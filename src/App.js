@@ -1,6 +1,7 @@
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AnnouncementBanner from './components/AnnouncementBanner';
+import ChatWidget from './components/ChatWidget';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import { CartProvider } from './context/CartContext';
@@ -31,6 +32,7 @@ const App = () => {
             </Routes>
             <Footer />
           </BrowserRouter>
+          <ChatWidget />
         </ToastProvider>
       </CartProvider>
     </StoreProvider>
