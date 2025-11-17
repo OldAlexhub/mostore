@@ -7,7 +7,7 @@ Quick start
 1. Install dependencies and start the dev server:
 
 ```bash
-cd "c:/Users/moham/Desktop/MO Store/client"
+cd "c:/Users/moham/Desktop/M&O Store/client"
 npm install
 npm start
 ```
@@ -55,7 +55,7 @@ There is a `Dockerfile` and `nginx.conf` included which will build the app and s
 Example build and run:
 
 ```bash
-cd "c:/Users/moham/Desktop/MO Store/client"
+cd "c:/Users/moham/Desktop/M&O Store/client"
 docker build -t mo-store-client --build-arg REACT_APP_API_URL="https://api.yourdomain.com" .
 docker run -p 8080:80 mo-store-client
 ```

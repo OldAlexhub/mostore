@@ -106,7 +106,7 @@ const Home = () => {
 
   return (
     <>
-      <SEO title="الرئيسية" description="MO Store - منتجات مميزة، شحن لكل المحافظات، استرجاع خلال 14 يوم." />
+      <SEO title="الرئيسية" description="M&O Store - منتجات مميزة، شحن لكل المحافظات، استرجاع خلال 14 يوم." />
       <main className="container py-4">
       <div className="hero-landing mb-3">
         <div className="row g-0 align-items-center">
@@ -180,3 +180,4 @@ const Home = () => {
 };
 
 export default Home;
+

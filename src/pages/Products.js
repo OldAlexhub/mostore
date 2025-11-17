@@ -280,7 +280,7 @@ const Products = () => {
     <>
       <SEO
         title={q ? `نتايج البحث: ${q}` : 'المنتجات'}
-        description={`تصفّح ${total || products.length} من منتجات MO Store. فلتر بحث متقدم، شحن لكل المحافظات، واسترجاع خلال ١٤ يوم.`}
+        description={`تصفّح ${total || products.length} من منتجات M&O Store. فلتر بحث متقدم، شحن لكل المحافظات، واسترجاع خلال ١٤ يوم.`}
         canonical={typeof window !== 'undefined' ? window.location.href : undefined}
         jsonLd={buildProductsJsonLd(products)}
       />
@@ -541,3 +541,4 @@ const Products = () => {
 };
 
 export default Products;
+

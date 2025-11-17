@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
-const DEFAULT_DESCRIPTION = 'MO Store - تسوّق ملابس واحتياجاتك بسهولة مع شحن لكل المحافظات وسياسة استرجاع مرنة.';
-const DEFAULT_TITLE = 'MO Store';
+const DEFAULT_DESCRIPTION = 'M&O Store - تسوّق ملابس واحتياجاتك بسهولة مع شحن لكل المحافظات وسياسة استرجاع مرنة.';
+const DEFAULT_TITLE = 'M&O Store';
 
 function ensureMeta(attrName, attrValue, content) {
   if (!content) return null;
@@ -71,3 +71,4 @@ const SEO = ({ title, description, canonical, image, jsonLd, noindex = false }) 
 };
 
 export default SEO;
+
