@@ -169,10 +169,10 @@ const ProductDetail = () => {
                 <div style={{ background: '#f7f7f7', padding: 20, borderRadius: 8, minHeight: 360 }} className="d-flex align-items-center justify-content-center">
                   {img ? <img src={img} alt={product.Name} style={{ maxWidth: '100%', maxHeight: 420, objectFit: 'contain' }} /> : <div className="text-muted">بدون صورة</div>}
                 </div>
-                {gallery.length > 1 && (
-                  <div className="d-flex justify-content-center gap-2 flex-wrap mt-3">
-                {gallery.slice(0, 2).map((url, idx) => (
-                  <button key={url} type="button" className={`btn p-1 ${activeImageIndex === idx ? 'border border-primary' : 'border'}`} onClick={() => setActiveImageIndex(idx)} style={{ background: '#fff' }}>
+            {gallery.length > 1 && (
+              <div className="d-flex justify-content-center gap-2 flex-wrap mt-3">
+                {gallery.map((url, idx) => (
+                  <button key={`${url}-${idx}`} type="button" className={`btn p-1 ${activeImageIndex === idx ? 'border border-primary' : 'border'}`} onClick={() => setActiveImageIndex(idx)} style={{ background: '#fff' }}>
                     <img src={url} alt={`عرض ${idx + 1}`} style={{ height: 80, width: 80, objectFit: 'cover' }} />
                   </button>
                 ))}

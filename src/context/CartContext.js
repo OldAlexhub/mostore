@@ -13,7 +13,9 @@ export const CartProvider = ({ children }) => {
 
   const add = (product, qty=1) => {
     setItems(prev=>{
-      const available = typeof product.QTY === 'number' ? product.QTY : null;
+      const available = typeof product.QTY === 'number'
+        ? product.QTY
+        : (typeof product.availableQty === 'number' ? product.availableQty : null);
       if (available !== null && available <= 0) return prev;
       const found = prev.find(i=>i._id===product._id);
       if(found) {
