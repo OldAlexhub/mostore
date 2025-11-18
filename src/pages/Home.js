@@ -42,6 +42,22 @@ const Home = () => {
     return s;
   };
 
+  const normalizeLabel = (value) => {
+    if (!value && value !== 0) return '';
+    return String(value)
+      .trim()
+      .toLowerCase()
+      .replace(/[\u064B-\u065F]/g, '') // remove harakat
+      .replace(/[أإآٱ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/ؤ/g, 'و')
+      .replace(/ئ/g, 'ي')
+      .replace(/[^\u0600-\u06FFA-Za-z0-9]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
   const [gems, setGems] = useState([]);
   const [cats, setCats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,17 +81,19 @@ const Home = () => {
     { label: 'منتجات التجميل', query: 'Beauty' }
   ];
   const categoryMeta = (() => {
-    const blocklist = new Set(featured.map(f => f.label));
+    const blocklist = new Set(featured.map(f => normalizeLabel(f.label)));
     const seen = new Set();
     const next = [];
     const labelToRaw = new Map();
     cats.forEach((cat) => {
       const label = translateCategory(cat);
       if (!label) return;
+      const normalized = normalizeLabel(label);
       if (!labelToRaw.has(label)) labelToRaw.set(label, cat);
-      if (blocklist.has(label)) return;
-      if (seen.has(label)) return;
-      seen.add(label);
+      if (!labelToRaw.has(normalized)) labelToRaw.set(normalized, cat);
+      if (blocklist.has(normalized)) return;
+      if (seen.has(normalized)) return;
+      seen.add(normalized);
       next.push({ raw: cat, label });
     });
     return { filtered: next, labelToRaw };
@@ -84,7 +102,8 @@ const Home = () => {
   const labelToRaw = categoryMeta.labelToRaw;
   const goToFeatured = ({ label, query }) => {
     if (label === 'الكل') return navigate('/products');
-    const resolved = labelToRaw.get(label) || query || '';
+    const normalized = normalizeLabel(label);
+    const resolved = labelToRaw.get(label) || labelToRaw.get(normalized) || query || '';
     if (!resolved) return navigate('/products');
     // prefer `Category` query param; Products page accepts `cat` or `Category`
     navigate(`/products?Category=${encodeURIComponent(resolved)}`);
@@ -106,7 +125,7 @@ const Home = () => {
 
   return (
     <>
-      <SEO title="الرئيسية" description="M&O Store - منتجات مميزة، شحن لكل المحافظات، استرجاع خلال 14 يوم." />
+      <SEO title="الرئيسية" description="M&O Store - منتجات مميزة." />
       <main className="container py-4">
       <div className="hero-landing mb-3">
         <div className="row g-0 align-items-center">
@@ -126,14 +145,13 @@ const Home = () => {
             <h1 className="mb-2" style={{fontSize: '2.1rem', fontWeight:700}}>أهلاً بيك في M&O Store</h1>
             <p className="mb-2 text-muted" style={{fontSize:16}}>أحسن الحاجات بأحسن الأسعار — عروض يومية وتوصيل سريع لحد باب البيت.</p>
             <p className="mb-3 text-muted" style={{fontSize:15}}>تسوق من تشكيلاتنا المُختارة: تخفيضات، منتجات جديدة، وخامات مضمونة.</p>
+            <p className="mb-3 text-muted" style={{fontSize:15}}>تعالى نورنا في شارع مسجد سيدي بشر قدام جراج النقل العام جنب كافيتريا الفارس.</p>
 
             <div className="d-flex justify-content-center justify-content-md-end mb-3">
               <Link to="/products" className="btn btn-brand btn-lg">تسوق الآن</Link>
             </div>
 
             <div className="d-flex justify-content-center justify-content-md-end gap-2 flex-wrap" style={{fontSize:13}}>
-              <div className="badge bg-light text-dark border">🚚 شحن مجاني فوق 1000 ج.م</div>
-              <div className="badge bg-light text-dark border">↩️ استرجاع خلال 14 يوم</div>
               <div className="badge bg-light text-dark border">💬 دعم 24/7</div>
             </div>
           </div>
@@ -146,12 +164,6 @@ const Home = () => {
             <button key={item.label} type="button" className="btn btn-sm btn-outline-secondary" onClick={() => goToFeatured(item)}>{item.label}</button>
           ))}
         </div>
-        <nav className="category-strip" aria-label="Categories">
-          <Link to="/products">الكل</Link>
-          {filteredCats.map(({ raw, label }) => (
-            <Link key={raw || label} to={`/products?Category=${encodeURIComponent(raw || label)}`}>{label}</Link>
-          ))}
-        </nav>
       </div>
 
       <section>

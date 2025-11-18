@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { useToast } from '../context/ToastContext';
@@ -21,19 +22,33 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const img = product.imageUrl || product.image || product.images?.[0] || product.productDetails?.imageUrl || '';
+  const gallery = [
+    product.imageUrl,
+    product.secondaryImageUrl,
+    ...(Array.isArray(product.imageGallery) ? product.imageGallery : []),
+    product.image,
+    ...(Array.isArray(product.images) ? product.images : []),
+    product.productDetails?.imageUrl
+  ].filter(Boolean);
+  const img = gallery[0] || '';
+  const productId = product?._id || product?.id;
+  const detailHref = productId ? `/product/${productId}` : '#';
 
   return (
     <div className="card h-100 shadow-sm" style={{ position: 'relative', overflow: 'visible' }}>
-      <div style={{ height: 140, background: '#f3f4f6' }} className="d-flex align-items-center justify-content-center">
-        {img ? (
-          <img src={img} alt={product.Name || ''} style={{ maxHeight: 140, maxWidth: '100%', objectFit: 'contain' }} />
-        ) : (
-          <span className="text-muted">صورة</span>
-        )}
-      </div>
+      <Link to={detailHref} className="d-block text-decoration-none text-dark">
+        <div style={{ height: 140, background: '#f3f4f6' }} className="d-flex align-items-center justify-content-center">
+          {img ? (
+            <img src={img} alt={product.Name || ''} style={{ maxHeight: 140, maxWidth: '100%', objectFit: 'contain' }} />
+          ) : (
+            <span className="text-muted">صورة</span>
+          )}
+        </div>
+      </Link>
       <div className="card-body p-2">
-        <h6 className="card-title mb-1" style={{ fontSize: 14 }}>{product.Name}</h6>
+        <h6 className="card-title mb-1" style={{ fontSize: 14 }}>
+          <Link to={detailHref} className="text-decoration-none text-dark">{product.Name}</Link>
+        </h6>
         <div className="d-flex justify-content-between align-items-center">
           <div className="text-muted">
             {isGeneralDiscount ? (
