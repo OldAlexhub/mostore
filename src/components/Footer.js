@@ -22,6 +22,13 @@ const Footer = () => {
           <div className="col-12 col-md-4">
             <h6 className="text-uppercase text-muted" style={{ fontSize: 11, letterSpacing: 2 }}>ابقَ على تواصل</h6>
             <p className="mb-1" style={{ fontSize: 13 }}>خدمة العملاء 24/7 عبر الشات أو صفحاتنا.</p>
+            <div className="mb-2 d-flex gap-2 align-items-center" style={{ fontSize: 13 }}>
+              <span>واتساب:</span>
+              <a href="https://wa.me/201008508808" className="text-light text-decoration-none fw-semibold d-flex align-items-center gap-1">
+                <span style={{ fontSize: 18 }}>🟢</span>
+                +201008508808
+              </a>
+            </div>
             <div style={{ fontSize: 12, color: '#c7bdf2' }}>مرحب بيك دايماً في الفرع، ونضمن لك تجربة تسوق مريحة وأنيقة.</div>
           </div>
         </div>

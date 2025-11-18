@@ -58,6 +58,16 @@ const Home = () => {
       .trim();
   };
 
+  const DEFAULT_HERO = {
+    header: 'أهلاً بيك في M&O Store',
+    sentence1: 'أحسن المنتجات بأحسن الأسعار — عروض يومية وتوصيل سريع لحد باب البيت.',
+    sentence2: 'تسوق من تشكيلاتنا المُختارة: تخفيضات، منتجات جديدة، وخامات مضمونة.',
+    sentence3: 'تعالى نورنا في شارع مسجد سيدي بشر امام جراج النقل العام بجوار كافيتريا الفارس.',
+    contactLabel: 'كلمنا على واتساب',
+    whatsappNumber: '+201008508808'
+  };
+
+  const [heroContent, setHeroContent] = useState(DEFAULT_HERO);
   const [gems, setGems] = useState([]);
   const [cats, setCats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,6 +79,18 @@ const Home = () => {
       .catch(() => {})
       .finally(() => { if (mounted) setLoading(false); });
     return () => mounted = false;
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    api.get('/api/hero')
+      .then(res => {
+        if (!mounted) return;
+        const data = res.data || {};
+        setHeroContent({ ...DEFAULT_HERO, ...data });
+      })
+      .catch(() => {});
+    return () => { mounted = false; };
   }, []);
 
   const navigate = useNavigate();
@@ -142,10 +164,23 @@ const Home = () => {
 
           {/* content column */}
           <div className="col-12 col-md-6 order-md-1 text-md-end text-center px-3 px-md-4">
-            <h1 className="mb-2" style={{fontSize: '2.1rem', fontWeight:700}}>أهلاً بيك في M&O Store</h1>
-            <p className="mb-2 text-muted" style={{fontSize:16}}>أحسن الحاجات بأحسن الأسعار — عروض يومية وتوصيل سريع لحد باب البيت.</p>
-            <p className="mb-3 text-muted" style={{fontSize:15}}>تسوق من تشكيلاتنا المُختارة: تخفيضات، منتجات جديدة، وخامات مضمونة.</p>
-            <p className="mb-3 text-muted" style={{fontSize:15}}>تعالى نورنا في شارع مسجد سيدي بشر قدام جراج النقل العام جنب كافيتريا الفارس.</p>
+            <h1 className="mb-2" style={{fontSize: '2.1rem', fontWeight:700}}>{heroContent.header}</h1>
+            <p className="mb-2 text-muted" style={{fontSize:16}}>{heroContent.sentence1}</p>
+            <p className="mb-3 text-muted" style={{fontSize:15}}>{heroContent.sentence2}</p>
+            <p className="mb-3 text-muted" style={{fontSize:15}}>{heroContent.sentence3}</p>
+            <div className="d-flex align-items-center justify-content-center justify-content-md-end gap-2 mb-3" style={{fontSize:15}}>
+              <span>{heroContent.contactLabel}</span>
+              {heroContent.whatsappNumber && (
+                <a
+                  href={`https://wa.me/${heroContent.whatsappNumber.replace(/^\+/, '')}`}
+                  className="text-decoration-none fw-semibold d-flex align-items-center gap-1"
+                  style={{color:'#25D366'}}
+                >
+                  <span style={{fontSize:20}}>🟢</span>
+                  {heroContent.whatsappNumber.startsWith('+') ? heroContent.whatsappNumber : `+${heroContent.whatsappNumber}`}
+                </a>
+              )}
+            </div>
 
             <div className="d-flex justify-content-center justify-content-md-end mb-3">
               <Link to="/products" className="btn btn-brand btn-lg">تسوق الآن</Link>
