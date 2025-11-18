@@ -113,9 +113,22 @@ const ProductDetail = () => {
 
   const isGeneralDiscount = discount && discount.active && discount.type === 'general' && (discount.value || 0) > 0;
   const discountedPrice = isGeneralDiscount ? Math.max(0, (product?.Sell || 0) * (1 - discount.value / 100)) : product?.Sell;
+  const availableQty = Number(product?.QTY ?? 0);
+  const minQty = Number(product?.minQty ?? 0);
+  const derivedStatus = availableQty <= 0
+    ? 'out_of_stock'
+    : (availableQty <= (minQty || 3) ? 'low_stock' : 'in_stock');
+  const stockStatus = product?.stockStatus || derivedStatus;
+  const statusLabel = stockStatus === 'out_of_stock' ? 'غير متوفر' : stockStatus === 'low_stock' ? 'كمية محدودة' : 'متوفر في المخزون';
+  const statusClass = stockStatus === 'out_of_stock' ? 'bg-danger' : stockStatus === 'low_stock' ? 'bg-warning text-dark' : 'bg-success';
+  const isOutOfStock = stockStatus === 'out_of_stock';
 
   const handleAddToCart = () => {
     if (!product) return;
+    if (isOutOfStock) {
+      if (toast && typeof toast.add === 'function') toast.add('هذا المنتج غير متوفر حالياً');
+      return;
+    }
     add(product, 1);
     if (toast && typeof toast.add === 'function') {
       toast.add(`${product.Name} اتضاف للسلة`);
@@ -169,6 +182,10 @@ const ProductDetail = () => {
               <div className="col-12 col-md-6">
                 <h1>{product.Name}</h1>
                 <div className="mb-3 text-muted">{[product.Category, product.Subcategory].filter(Boolean).join(' • ')}</div>
+                <div className="mb-2">
+                  <span className={`badge ${statusClass}`} style={{ fontSize: 12 }}>{statusLabel}</span>
+                  {stockStatus === 'low_stock' && <small className="text-warning ms-2">سارع قبل نفاد الكمية!</small>}
+                </div>
                 <div className="mb-3">
                   {isGeneralDiscount ? (
                     <div className="d-flex flex-column align-items-start gap-1">
@@ -181,14 +198,17 @@ const ProductDetail = () => {
                   )}
                 </div>
                 <div className="mb-3">
-                  <button className="btn btn-brand btn-lg w-100" onClick={handleAddToCart}>أضف إلى السلة</button>
+                  <button className="btn btn-brand btn-lg w-100" onClick={handleAddToCart} disabled={isOutOfStock}>
+                    {isOutOfStock ? 'غير متوفر حالياً' : 'أضف إلى السلة'}
+                  </button>
                 </div>
                 <div className="mb-3">{product.Description}</div>
                 <ul className="list-unstyled small text-muted">
+                  <li><strong>حالة المخزون:</strong> {statusLabel}</li>
+                  <li><strong>الكمية المتاحة:</strong> {availableQty}</li>
                   {product.Material && <li><strong>الخامة:</strong> {product.Material}</li>}
                   {product.Season && <li><strong>الموسم:</strong> {product.Season}</li>}
                   {product.Style && <li><strong>الستايل:</strong> {product.Style}</li>}
-                  <li><strong>حالة المخزون:</strong> {product.QTY > 0 ? 'متاح للشحن' : 'يتم توفيره عند الطلب'}</li>
                 </ul>
               </div>
             </div>

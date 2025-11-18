@@ -13,9 +13,16 @@ export const CartProvider = ({ children }) => {
 
   const add = (product, qty=1) => {
     setItems(prev=>{
+      const available = typeof product.QTY === 'number' ? product.QTY : null;
+      if (available !== null && available <= 0) return prev;
       const found = prev.find(i=>i._id===product._id);
-      if(found) return prev.map(i=> i._id===product._id ? {...i, qty: i.qty + qty} : i);
-      return [...prev, {...product, qty}];
+      if(found) {
+        const nextQty = (found.qty || 0) + qty;
+        const clamped = available !== null ? Math.min(nextQty, available) : nextQty;
+        return prev.map(i=> i._id===product._id ? {...i, qty: clamped} : i);
+      }
+      const initialQty = available !== null ? Math.min(qty, available) : qty;
+      return [...prev, {...product, qty: initialQty}];
     });
   };
   const decrease = (productId, qty = 1) => {

@@ -12,8 +12,21 @@ const ProductCard = ({ product }) => {
 
   const isGeneralDiscount = discount && discount.active && discount.type === 'general' && discount.value > 0;
   const discountedPrice = isGeneralDiscount ? Math.max(0, (product.Sell || 0) * (1 - discount.value / 100)) : product.Sell;
+  const availableQty = Number(product.QTY ?? product.availableQty ?? 0);
+  const minQty = Number(product.minQty ?? 0);
+  const derivedStatus = availableQty <= 0
+    ? 'out_of_stock'
+    : (availableQty <= (minQty || 3) ? 'low_stock' : 'in_stock');
+  const stockStatus = product.stockStatus || derivedStatus;
+  const statusLabel = stockStatus === 'out_of_stock' ? 'نفدت الكمية' : stockStatus === 'low_stock' ? 'كمية محدودة' : 'متوفر';
+  const statusClass = stockStatus === 'out_of_stock' ? 'bg-danger' : stockStatus === 'low_stock' ? 'bg-warning text-dark' : 'bg-success';
+  const isOutOfStock = stockStatus === 'out_of_stock';
 
   const handleAdd = () => {
+    if (isOutOfStock) {
+      if (toast && typeof toast.add === 'function') toast.add('هذا المنتج غير متوفر حالياً');
+      return;
+    }
     add(product, 1);
     setShowAdded(true);
     setTimeout(() => setShowAdded(false), 900);
@@ -49,6 +62,7 @@ const ProductCard = ({ product }) => {
         <h6 className="card-title mb-1" style={{ fontSize: 14 }}>
           <Link to={detailHref} className="text-decoration-none text-dark">{product.Name}</Link>
         </h6>
+        <span className={`badge ${statusClass}`} style={{ fontSize: 11 }}>{statusLabel}</span>
         <div className="d-flex justify-content-between align-items-center">
           <div className="text-muted">
             {isGeneralDiscount ? (
@@ -60,8 +74,11 @@ const ProductCard = ({ product }) => {
               <>ج.م {product.Sell}</>
             )}
           </div>
-          <button className="btn btn-sm btn-outline-primary" onClick={handleAdd}>أضف للسلة</button>
+          <button className="btn btn-sm btn-outline-primary" onClick={handleAdd} disabled={isOutOfStock}>
+            {isOutOfStock ? 'غير متوفر' : 'أضف للسلة'}
+          </button>
         </div>
+        {stockStatus === 'low_stock' && <small className="text-warning d-block mt-1">سارع قبل ما تخلص!</small>}
       </div>
 
       {showAdded && (
