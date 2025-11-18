@@ -9,7 +9,7 @@ const Footer = () => {
           <div className="col-12 col-md-4">
             <div style={{ fontWeight: 700, fontSize: 20 }}>M&O Store</div>
             <p className="text-muted mb-2" style={{ fontSize: 13 }}>© {year} — كل الحقوق محفوظة.</p>
-            <p className="mb-0" style={{ fontSize: 14 }}>شارع مسجد سيدي بشر قدام جراج النقل العام جنب كافيتريا الفارس.</p>
+            <p className="mb-0" style={{ fontSize: 14 }}>شارع مسجد سيدي بشر امام جراج النقل العام بجوار كافيتريا الفارس.</p>
           </div>
           <div className="col-12 col-md-4">
             <h6 className="text-uppercase text-muted" style={{ fontSize: 11, letterSpacing: 2 }}>روابط سريعة</h6>
