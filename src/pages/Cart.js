@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { formatEGP } from '../utils/formatCurrency';
 import getPrimaryImage from '../utils/getPrimaryImage';
+import { PHONE_DIGIT_COUNT, clampPhoneNumber, isValidPhoneNumber, normalizePhoneNumber } from '../utils/phone';
 
 const Cart = () => {
   const { items, add, remove, clear, totalItems, totalPrice } = useCart();
@@ -42,20 +43,29 @@ const Cart = () => {
 
   const inc = (product) => add(product, 1);
 
+  const handleGuestPhoneChange = (value) => {
+    const limited = clampPhoneNumber(value);
+    setGuestPhone(limited);
+  };
+
   const doCheckout = async () => {
     if (!items.length) return setMessage('سلتك لسه فاضية.');
     if (!guestName || !guestAddress || !guestPhone) {
       return setMessage('من فضلك اكتب الاسم والعنوان ورقم الموبايل كاملين.');
     }
+    if (!isValidPhoneNumber(guestPhone)) {
+      return setMessage(`رقم الموبايل لازم يكون ${PHONE_DIGIT_COUNT} رقم.`);
+    }
     setLoading(true);
     try {
+      const normalizedPhone = normalizePhoneNumber(guestPhone);
       const payload = {
         products: items.map((i) => ({ product: i._id, qty: i.qty, price: i.Sell })),
         totalPrice,
         couponCode: coupon || undefined,
         name: guestName,
         address: guestAddress,
-        phone: guestPhone
+        phone: normalizedPhone
       };
       const res = await api.post('/api/orders', payload);
       clear();
@@ -136,7 +146,18 @@ const Cart = () => {
                 <label className="form-label">العنوان بالتفصيل</label>
                 <input className="form-control form-control-sm mb-2" value={guestAddress} onChange={(e) => setGuestAddress(e.target.value)} />
                 <label className="form-label">رقم الموبايل</label>
-                <input className="form-control form-control-sm" value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)} />
+                <input
+                  className="form-control form-control-sm"
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="\\d*"
+                  maxLength={PHONE_DIGIT_COUNT}
+                  value={guestPhone}
+                  onChange={(e) => handleGuestPhoneChange(e.target.value)}
+                />
+                <div className="form-text text-muted mt-1" style={{ fontSize: 12 }}>
+                  رقم الموبايل لازم يكون {PHONE_DIGIT_COUNT} رقم.
+                </div>
               </div>
 
               <hr />
