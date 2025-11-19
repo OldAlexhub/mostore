@@ -4,6 +4,7 @@ import api from '../api';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { formatEGP } from '../utils/formatCurrency';
+import getPrimaryImage from '../utils/getPrimaryImage';
 
 const Cart = () => {
   const { items, add, remove, clear, totalItems, totalPrice } = useCart();
@@ -90,7 +91,7 @@ const Cart = () => {
               <div key={item._id} className="d-flex align-items-center border rounded p-2 mb-2">
                 <div style={{ width: 80, height: 60, background: '#f3f4f6' }} className="d-flex align-items-center justify-content-center ms-2">
                   {(() => {
-                    const img = item.imageUrl || item.image || item.images?.[0] || item.productDetails?.imageUrl || '';
+                    const img = getPrimaryImage(item, item.productDetails);
                     return img ? (
                       <img src={img} alt={item.Name || ''} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                     ) : (

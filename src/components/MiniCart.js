@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { formatEGP } from '../utils/formatCurrency';
+import getPrimaryImage from '../utils/getPrimaryImage';
 
 const MiniCart = ({ className = '' }) => {
   const { items, decrease, remove, totalItems, totalPrice } = useCart();
@@ -55,7 +56,7 @@ const MiniCart = ({ className = '' }) => {
           {items.length > 0 && (
             <div style={{ maxHeight: 220, overflowY: 'auto' }}>
               {items.map((item) => {
-                const img = item.imageUrl || item.image || item.images?.[0] || item.productDetails?.imageUrl || '';
+                const img = getPrimaryImage(item, item.productDetails);
                 return (
                 <div key={item._id} className="d-flex align-items-center gap-3 mb-3">
                   <div className="d-flex align-items-center justify-content-center bg-light text-muted rounded" style={{ width: 48, height: 48, flexShrink: 0 }}>

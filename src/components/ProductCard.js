@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { useToast } from '../context/ToastContext';
+import getPrimaryImage from '../utils/getPrimaryImage';
 
 const ProductCard = ({ product }) => {
   const { add, decrease } = useCart();
@@ -35,15 +36,7 @@ const ProductCard = ({ product }) => {
     }
   };
 
-  const gallery = [
-    product.imageUrl,
-    product.secondaryImageUrl,
-    ...(Array.isArray(product.imageGallery) ? product.imageGallery : []),
-    product.image,
-    ...(Array.isArray(product.images) ? product.images : []),
-    product.productDetails?.imageUrl
-  ].filter(Boolean);
-  const img = gallery[0] || '';
+  const img = getPrimaryImage(product);
   const productId = product?._id || product?.id;
   const detailHref = productId ? `/product/${productId}` : '#';
 

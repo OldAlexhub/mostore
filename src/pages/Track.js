@@ -2,6 +2,32 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { formatEGP } from '../utils/formatCurrency';
+import getPrimaryImage from '../utils/getPrimaryImage';
+
+const API_BASE = (process.env.REACT_APP_API_BASE && process.env.REACT_APP_API_BASE.trim()) || '/api';
+
+const deriveServerOrigin = () => {
+  try {
+    if (API_BASE.startsWith('http')) {
+      const url = new URL(API_BASE);
+      return url.origin;
+    }
+  } catch (e) {
+    // ignore
+  }
+  if (typeof window !== 'undefined') return window.location.origin;
+  return '';
+};
+
+const SERVER_ORIGIN = deriveServerOrigin();
+
+const withServerOrigin = (value) => {
+  if (!value || typeof value !== 'string') return '';
+  if (value.startsWith('/') && !value.startsWith('//')) {
+    return `${SERVER_ORIGIN}${value}`;
+  }
+  return value;
+};
 
 const STATUS_LABELS = {
   pending: 'بانتظار المراجعة',
@@ -186,14 +212,7 @@ const Track = () => {
           <hr />
                     <div><strong>تفاصيل التكلفة</strong></div>
           {order.products && order.products.map((p, idx) => {
-            const img = p.imageUrl
-              || p.productDetails?.imageUrl
-              || p.productDetails?.image
-              || p.productDetails?.images?.[0]
-              || p.product?.imageUrl
-              || p.product?.image
-              || p.product?.images?.[0]
-              || '';
+            const img = withServerOrigin(getPrimaryImage(p, p.productDetails));
             const name = p.productDetails?.Name || p.productName || p.product?.Name || '-';
             const qty = p.quantity || p.qty || 1;
             const price = Number(p.productDetails?.Sell || p.price || 0);
@@ -274,7 +293,7 @@ const Track = () => {
                             <div className="d-flex align-items-center" style={{ gap: 10 }}>
                               {item.firstProductImage ? (
                                 <div style={{ width: 48, height: 48, background: '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #f0f0f0' }}>
-                                  <img src={item.firstProductImage} alt={`#${item.orderNumber}`} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                                  <img src={withServerOrigin(item.firstProductImage)} alt={`#${item.orderNumber}`} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                                 </div>
                               ) : null}
                               <span className="badge bg-light text-dark">{STATUS_LABELS[item.status] || item.status}</span>

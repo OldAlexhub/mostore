@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../api';
 import MiniCart from '../components/MiniCart';
 import ProductCard from '../components/ProductCard';
@@ -8,6 +8,7 @@ import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { useToast } from '../context/ToastContext';
 import { formatEGP } from '../utils/formatCurrency';
+import getPrimaryImage from '../utils/getPrimaryImage';
 
 const csvToArray = (value) => (value ? value.toString().split(',').map(v => v.trim()).filter(Boolean) : []);
 
@@ -265,7 +266,7 @@ const Products = () => {
     const products = (items || []).slice(0, 10).map(p => ({
       '@type': 'Product',
       name: p.Name || '',
-      image: p.imageUrl || p.image || (p.images && p.images[0]) || p.productDetails?.imageUrl || undefined,
+      image: getPrimaryImage(p) || undefined,
       sku: p.Number || p.number || p._id || undefined,
       offers: p.Sell ? { '@type': 'Offer', priceCurrency: 'EGP', price: String(p.Sell), availability: 'http://schema.org/InStock' } : undefined
     }));
@@ -460,18 +461,25 @@ const Products = () => {
             <div className="list-group shadow-sm">
               {products.map(product => {
                 const priceMeta = getPriceMeta(product);
+                const productId = product?._id || product?.id;
+                const detailHref = productId ? `/product/${productId}` : '#';
+                const navigateToDetail = () => {
+                  if (productId) navigate(detailHref);
+                };
                 return (
-                  <div key={product._id} className="list-group-item py-4">
+                  <div key={product._id} className="list-group-item py-4" role="button" onClick={navigateToDetail}>
                     <div className="d-flex flex-wrap gap-3 align-items-center">
-                      <div className="products-list-thumb bg-light rounded flex-shrink-0 d-flex align-items-center justify-content-center" style={{ width: 96, height: 96 }}>
-                        {(() => {
-                          const img = product.imageUrl || product.image || product.images?.[0] || product.productDetails?.imageUrl || '';
-                          return img ? <img src={img} alt={product.Name || ''} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <div style={{ fontSize: 11, color: '#999' }}>بدون صورة</div>;
-                        })()}
-                      </div>
-                      <div className="flex-grow-1">
-                        <h5 className="mb-1">{product.Name}</h5>
-                        <div className="text-muted">{[product.Category, product.Subcategory].filter(Boolean).join(' • ')}</div>
+                      <div className="d-flex gap-3 align-items-center text-dark flex-grow-1">
+                        <div className="products-list-thumb bg-light rounded flex-shrink-0 d-flex align-items-center justify-content-center" style={{ width: 96, height: 96 }}>
+                          {(() => {
+                            const img = getPrimaryImage(product);
+                            return img ? <img src={img} alt={product.Name || ''} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <div style={{ fontSize: 11, color: '#999' }}>بدون صورة</div>;
+                          })()}
+                        </div>
+                        <div>
+                          <h5 className="mb-1">{product.Name}</h5>
+                          <div className="text-muted">{[product.Category, product.Subcategory].filter(Boolean).join(' • ')}</div>
+                        </div>
                       </div>
                       <div className="text-end ms-auto">
                         <div className="fw-bold">
@@ -482,7 +490,12 @@ const Products = () => {
                             </>
                           ) : formatEGP(priceMeta.current)}
                         </div>
-                        <button className="btn btn-sm btn-brand mt-2" onClick={() => quickAdd(product)}>إضافة سريعة</button>
+                        <button
+                          className="btn btn-sm btn-brand mt-2"
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); quickAdd(product); }}
+                        >
+                          أضف للسلة
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -490,26 +503,24 @@ const Products = () => {
               })}
             </div>
           )}
-
           {view === 'compact' && products.length > 0 && (
             <div className="row g-2">
               {products.map(product => (
                 <div key={product._id} className="col-6 col-sm-4 col-md-3 col-lg-2">
-                  <div className="card p-2 text-center h-100">
-                      <div className="products-compact-thumb bg-light mb-2 d-flex align-items-center justify-content-center rounded" style={{ height: 72 }}>
-                        {(() => {
-                          const img = product.imageUrl || product.image || product.images?.[0] || product.productDetails?.imageUrl || '';
-                          return img ? <img src={img} alt={product.Name || ''} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <div style={{ fontSize: 11, color: '#999' }}>بدون صورة</div>;
-                        })()}
-                      </div>
+                  <Link to={product?._id ? `/product/${product._id}` : '#'} className="card p-2 text-center h-100 text-decoration-none text-dark">
+                    <div className="products-compact-thumb bg-light mb-2 d-flex align-items-center justify-content-center rounded" style={{ height: 72 }}>
+                      {(() => {
+                        const img = getPrimaryImage(product);
+                        return img ? <img src={img} alt={product.Name || ''} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} /> : <div style={{ fontSize: 11, color: '#999' }}>???? ????</div>;
+                      })()}
+                    </div>
                     <div className="text-truncate fw-semibold" style={{ fontSize: 13 }}>{product.Name}</div>
                     <div className="text-muted" style={{ fontSize: 12 }}>{formatEGP(product.Sell)}</div>
-                  </div>
+                  </Link>
                 </div>
               ))}
             </div>
           )}
-
           {pages > 0 && (
             <nav className="d-flex justify-content-center mt-4" aria-label="التصفح">
               <ul className="pagination">
@@ -541,4 +552,7 @@ const Products = () => {
 };
 
 export default Products;
+
+
+
 
