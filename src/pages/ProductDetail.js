@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import api from '../api';
-import ProductCard from '../components/ProductCard';
 import MiniCart from '../components/MiniCart';
+import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
@@ -83,7 +83,7 @@ const ProductDetail = () => {
       seen.add(src);
       unique.push(src);
     });
-    return unique.slice(0, 5);
+    return unique.slice(0, 20);
   }, [product]);
 
   const handleSubmitReview = (e) => {
