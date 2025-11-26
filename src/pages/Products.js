@@ -250,7 +250,7 @@ const Products = () => {
   };
 
   // removed unused helpers (scrollProductList, heroHighlights, quickCategoryPills)
-  const featureBadges = ['شحن لكل المحافظات', 'استرجاع خلال ١٤ يوم', 'دفع عند الاستلام'];
+  const featureBadges = ['دفع عند الاستلام'];
   const viewOptions = [
     { id: 'grid', label: 'شبكي', caption: 'نظرة سريعة' },
     { id: 'list', label: 'تفاصيل', caption: 'وصف وسعر' },
