@@ -95,13 +95,14 @@ const Home = () => {
 
   const navigate = useNavigate();
   // featured categories shown on home that should open /products with that filter
-  const featured = [
+  const FALLBACK_FEATURED = [
     { label: 'الكل', query: '' },
     { label: 'أوشحة وحجاب', query: 'Scarves' },
     { label: 'اكسسوارات', query: 'Accessories' },
     { label: 'ملابس', query: 'Clothes' },
     { label: 'منتجات التجميل', query: 'Beauty' }
   ];
+  const [featured, setFeatured] = useState(FALLBACK_FEATURED);
   const categoryMeta = (() => {
     const blocklist = new Set(featured.map(f => normalizeLabel(f.label)));
     const seen = new Set();
@@ -137,9 +138,44 @@ const Home = () => {
     api.get('/api/products')
       .then(res => {
         if (!mounted) return;
-        const list = res.data || [];
+        const list = Array.isArray(res.data?.products) ? res.data.products : Array.isArray(res.data) ? res.data : [];
         const uniq = Array.from(new Set(list.map(p => p.Category).filter(Boolean)));
         setCats(uniq.slice(0, 12));
+
+        // pick top categories that actually have products
+        const counts = new Map();
+        list.forEach(p => {
+          const raw = p.Category;
+          if (!raw) return;
+          const normalized = normalizeLabel(raw);
+          if (!normalized) return;
+          counts.set(raw, (counts.get(raw) || 0) + 1);
+        });
+
+        const dynamicFeatured = Array.from(counts.entries())
+          .sort((a, b) => b[1] - a[1])
+          .map(([raw]) => ({ label: translateCategory(raw), query: raw }))
+          .filter(item => item.label)
+          .slice(0, 4);
+
+        const seen = new Set();
+        const merged = [];
+        const pushUnique = (item) => {
+          const normalized = normalizeLabel(item.label);
+          if (!normalized || seen.has(normalized)) return;
+          seen.add(normalized);
+          merged.push(item);
+        };
+
+        pushUnique({ label: 'الكل', query: '' });
+        dynamicFeatured.forEach(pushUnique);
+        if (merged.length < FALLBACK_FEATURED.length) {
+          FALLBACK_FEATURED.slice(1).forEach(item => {
+            if (merged.length >= FALLBACK_FEATURED.length) return;
+            pushUnique(item);
+          });
+        }
+        if (merged.length) setFeatured(merged);
       })
       .catch(() => {})
     return () => mounted = false;
