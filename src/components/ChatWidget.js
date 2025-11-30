@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import api from '../api';
 import messageSound from '../sounds/newmessage.mp3';
@@ -61,7 +61,7 @@ const ChatWidget = () => {
     audioRef.current.play().catch(() => {});
   };
 
-  const persistSessionId = (id) => {
+  const persistSessionId = useCallback((id) => {
     try {
       if (id) {
         localStorage.setItem(STORAGE_KEY, id);
@@ -71,9 +71,9 @@ const ChatWidget = () => {
     } catch (e) {
       // ignore storage errors
     }
-  };
+  }, []);
 
-  const hydrateSession = async (id) => {
+  const hydrateSession = useCallback(async (id) => {
     if (!id) {
       setInitializing(false);
       return;
@@ -97,7 +97,7 @@ const ChatWidget = () => {
     } finally {
       setInitializing(false);
     }
-  };
+  }, [persistSessionId]);
 
   useEffect(() => {
     let storedId = null;
@@ -107,7 +107,7 @@ const ChatWidget = () => {
       storedId = null;
     }
     hydrateSession(storedId);
-  }, []);
+  }, [hydrateSession]);
 
   useEffect(() => {
     if (!session?._id) return undefined;
