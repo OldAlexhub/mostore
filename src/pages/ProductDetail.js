@@ -8,6 +8,7 @@ import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
 import { useToast } from '../context/ToastContext';
 import { formatEGP } from '../utils/formatCurrency';
+import getPrimaryImage from '../utils/getPrimaryImage';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -139,7 +140,8 @@ const ProductDetail = () => {
   if (error) return <div className="alert alert-danger">{error}</div>;
   if (!product) return <div className="text-center text-muted py-4">لا يوجد منتج.</div>;
 
-  const img = gallery[activeImageIndex] || gallery[0] || product.imageUrl || '';
+  const rawImg = gallery[activeImageIndex] || gallery[0] || product.imageUrl || '';
+  const img = getPrimaryImage(rawImg, product);
 
   const jsonLd = {
     '@context': 'https://schema.org/',
@@ -173,7 +175,7 @@ const ProductDetail = () => {
               <div className="d-flex justify-content-center gap-2 flex-wrap mt-3">
                 {gallery.map((url, idx) => (
                   <button key={`${url}-${idx}`} type="button" className={`btn p-1 ${activeImageIndex === idx ? 'border border-primary' : 'border'}`} onClick={() => setActiveImageIndex(idx)} style={{ background: '#fff' }}>
-                    <img src={url} alt={`عرض ${idx + 1}`} style={{ height: 80, width: 80, objectFit: 'cover' }} />
+                    <img src={getPrimaryImage(url, product)} alt={`عرض ${idx + 1}`} style={{ height: 80, width: 80, objectFit: 'cover' }} />
                   </button>
                 ))}
               </div>

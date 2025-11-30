@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { formatEGP } from '../utils/formatCurrency';
-import getPrimaryImage from '../utils/getPrimaryImage';
+import getPrimaryImage, { buildImageProxyUrl } from '../utils/getPrimaryImage';
 
 const API_BASE = (process.env.REACT_APP_API_BASE && process.env.REACT_APP_API_BASE.trim()) || '/api';
 
@@ -212,7 +212,10 @@ const Track = () => {
           <hr />
                     <div><strong>تفاصيل التكلفة</strong></div>
           {order.products && order.products.map((p, idx) => {
-            const img = withServerOrigin(getPrimaryImage(p, p.productDetails));
+            const primary = getPrimaryImage(p, p.productDetails);
+            const normalized = withServerOrigin(primary);
+            const isDrive = /drive\.google\.com|googleusercontent\.com/i.test(normalized || '');
+            const img = isDrive ? buildImageProxyUrl(normalized) : normalized;
             const name = p.productDetails?.Name || p.productName || p.product?.Name || '-';
             const qty = p.quantity || p.qty || 1;
             const price = Number(p.productDetails?.Sell || p.price || 0);
