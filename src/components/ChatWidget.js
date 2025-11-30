@@ -31,8 +31,6 @@ const ChatWidget = () => {
   const [session, setSession] = useState(null);
   const [messages, setMessages] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [customerName, setCustomerName] = useState('');
-  const [needsName, setNeedsName] = useState(false);
   const [messageInput, setMessageInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -87,7 +85,6 @@ const ChatWidget = () => {
         persistSessionId(null);
         setSession(null);
         setMessages([]);
-        setNeedsName(false);
       } else {
         setSession(nextSession);
         setMessages(nextSession.messages || []);
@@ -134,8 +131,6 @@ const ChatWidget = () => {
       persistSessionId(null);
       setSession(null);
       setMessages([]);
-      setNeedsName(false);
-      setCustomerName('');
       setPhoneNumber('');
       setInfo('تم إنهاء المحادثة من قبل فريق الدعم.');
     });
@@ -155,22 +150,22 @@ const ChatWidget = () => {
   const startChat = async (event) => {
     event.preventDefault();
     if (loading) return;
+    const digitsOnly = phoneNumber.replace(/\D/g, '');
+    if (!/^01[0-2,5]\d{8}$/.test(digitsOnly)) {
+      setError('أدخل رقماً مصرياً صحيحاً مكوناً من 11 رقم (يبدأ بـ 01).');
+      return;
+    }
     setLoading(true);
     setError('');
     setInfo('');
     try {
       const payload = { phoneNumber };
-      if (needsName || customerName) {
-        payload.name = customerName;
-      }
       const res = await api.post('/api/chat/start', payload);
       const nextSession = res.data?.session;
       if (nextSession) {
         setSession(nextSession);
         setMessages(nextSession.messages || []);
         persistSessionId(nextSession._id);
-        setNeedsName(false);
-        setCustomerName('');
         setPhoneNumber(nextSession.customerPhone || phoneNumber);
         setIsOpen(true);
         setInfo('');
@@ -178,9 +173,6 @@ const ChatWidget = () => {
     } catch (err) {
       const response = err.response?.data;
       const message = response?.error || 'تعذر بدء المحادثة، حاول مرة أخرى.';
-      if (response?.requiresName) {
-        setNeedsName(true);
-      }
       setError(message);
     } finally {
       setLoading(false);
@@ -214,8 +206,6 @@ const ChatWidget = () => {
       setSession(null);
       setMessages([]);
       setMessageInput('');
-      setNeedsName(false);
-      setCustomerName('');
       setPhoneNumber('');
       setInfo('تم إغلاق المحادثة، يمكنك بدء محادثة جديدة في أي وقت.');
     }
@@ -257,7 +247,7 @@ const ChatWidget = () => {
             <div>
               <div className="chat-title">دردشة العملاء</div>
               <div className="chat-subtitle">
-                {hasActiveSession ? 'متصل الآن بخدمة العملاء' : 'أدخل معلوماتك لبدء الدردشة'}
+                {hasActiveSession ? 'متصل الآن بخدمة العملاء' : 'أدخل رقم هاتفك لبدء الدردشة حتى بدون طلب'}
               </div>
             </div>
             {hasActiveSession && (
@@ -270,27 +260,15 @@ const ChatWidget = () => {
           {!hasActiveSession && (
             <form className="chat-form" onSubmit={startChat}>
               <label>
-                رقم الهاتف المستخدم في الطلب
+                رقم الهاتف للتواصل
                 <input
                   type="tel"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="05xxxxxxxx"
+                  placeholder="01xxxxxxxxx"
                   required
                 />
               </label>
-              {needsName && (
-                <label>
-                  الاسم
-                  <input
-                    type="text"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="الاسم الكامل"
-                    required
-                  />
-                </label>
-              )}
               {error && <div className="chat-error">{error}</div>}
               {info && <div className="chat-info">{info}</div>}
               <button type="submit" className="chat-submit" disabled={loading}>
