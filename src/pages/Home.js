@@ -5,67 +5,59 @@ import ProductCard from '../components/ProductCard';
 import SEO from '../components/SEO';
 import bannerImg from '../images/banner.png';
 
+const AR_CATEGORY = {
+  dresses: 'فساتين',
+  shoes: 'أحذية',
+  accessories: 'اكسسوارات',
+  new: 'وصل حديثاً',
+  sale: 'تخفيضات',
+  gift: 'هدايا',
+  all: 'الكل'
+};
+
+const translateCategory = (raw) => {
+  if (!raw && raw !== 0) return raw;
+  const s = String(raw).trim();
+  if (/[\u0600-\u06FF]/.test(s)) return s;
+  const low = s.toLowerCase();
+  const key = low.replace(/[^a-z0-9]+/g, ' ').split(' ')[0];
+  if (AR_CATEGORY[key]) return AR_CATEGORY[key];
+  if (low.includes('scarv') || low.includes('hijab')) return 'أوشحة وحجاب';
+  if (low.includes('scarf')) return 'أوشحة';
+  if (low.includes('cloth') || low.includes('apparel')) return 'ملابس';
+  if (low.includes('beaut') || low.includes('cosmet')) return 'منتجات التجميل';
+  if (low.includes('accessor')) return 'اكسسوارات';
+  if (low.includes('sale')) return 'تخفيضات';
+  if (low === 'all' || low === 'الكل') return 'الكل';
+  return s;
+};
+
+const normalizeLabel = (value) => {
+  if (!value && value !== 0) return '';
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[\u064B-\u065F]/g, '')
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/ة/g, 'ه')
+    .replace(/ى/g, 'ي')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي')
+    .replace(/[^\u0600-\u06FFA-Za-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const DEFAULT_HERO = {
+  header: 'أهلاً بيك في M&O Store',
+  sentence1: 'أحسن المنتجات بأحسن الأسعار — عروض يومية وتوصيل سريع لحد باب البيت.',
+  sentence2: 'تسوق من تشكيلاتنا المُختارة: تخفيضات، منتجات جديدة، وخامات مضمونة.',
+  sentence3: 'تعالى نورنا في شارع مسجد سيدي بشر امام جراج النقل العام بجوار كافيتريا الفارس.',
+  contactLabel: 'كلمنا على واتساب',
+  whatsappNumber: '+201008508808'
+};
+
 const Home = () => {
-  // Arabic translations for common category keys. If a category is already Arabic
-  // or not listed here, we fall back to the original value.
-  const AR_CATEGORY = {
-    dresses: 'فساتين',
-    shoes: 'أحذية',
-    accessories: 'اكسسوارات',
-    new: 'وصل حديثاً',
-    sale: 'تخفيضات',
-    gift: 'هدايا',
-    all: 'الكل'
-  };
-
-  const translateCategory = (raw) => {
-    if (!raw && raw !== 0) return raw;
-    const s = String(raw).trim();
-    // if it's already Arabic or contains Arabic letters, return as-is
-    if (/[\u0600-\u06FF]/.test(s)) return s;
-
-    const low = s.toLowerCase();
-    // direct lookup by simplified key
-    const key = low.replace(/[^a-z0-9]+/g, ' ').split(' ')[0];
-    if (AR_CATEGORY[key]) return AR_CATEGORY[key];
-
-    // heuristics
-    if (low.includes('scarv') || low.includes('hijab')) return 'أوشحة وحجاب';
-    if (low.includes('scarf')) return 'أوشحة';
-    if (low.includes('cloth') || low.includes('apparel')) return 'ملابس';
-    if (low.includes('beaut') || low.includes('cosmet')) return 'منتجات التجميل';
-    if (low.includes('accessor')) return 'اكسسوارات';
-    if (low.includes('sale')) return 'تخفيضات';
-    if (low === 'all' || low === 'الكل') return 'الكل';
-
-    // fallback to original
-    return s;
-  };
-
-  const normalizeLabel = (value) => {
-    if (!value && value !== 0) return '';
-    return String(value)
-      .trim()
-      .toLowerCase()
-      .replace(/[\u064B-\u065F]/g, '') // remove harakat
-      .replace(/[أإآٱ]/g, 'ا')
-      .replace(/ة/g, 'ه')
-      .replace(/ى/g, 'ي')
-      .replace(/ؤ/g, 'و')
-      .replace(/ئ/g, 'ي')
-      .replace(/[^\u0600-\u06FFA-Za-z0-9]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  };
-
-  const DEFAULT_HERO = {
-    header: 'أهلاً بيك في M&O Store',
-    sentence1: 'أحسن المنتجات بأحسن الأسعار — عروض يومية وتوصيل سريع لحد باب البيت.',
-    sentence2: 'تسوق من تشكيلاتنا المُختارة: تخفيضات، منتجات جديدة، وخامات مضمونة.',
-    sentence3: 'تعالى نورنا في شارع مسجد سيدي بشر امام جراج النقل العام بجوار كافيتريا الفارس.',
-    contactLabel: 'كلمنا على واتساب',
-    whatsappNumber: '+201008508808'
-  };
 
   const [heroContent, setHeroContent] = useState(DEFAULT_HERO);
   const [gems, setGems] = useState([]);
@@ -95,14 +87,9 @@ const Home = () => {
 
   const navigate = useNavigate();
   // featured categories shown on home that should open /products with that filter
-  const FALLBACK_FEATURED = [
-    { label: 'الكل', query: '' },
-    { label: 'أوشحة وحجاب', query: 'Scarves' },
-    { label: 'اكسسوارات', query: 'Accessories' },
-    { label: 'ملابس', query: 'Clothes' },
-    { label: 'منتجات التجميل', query: 'Beauty' }
-  ];
-  const [featured, setFeatured] = useState(FALLBACK_FEATURED);
+  // NOTE: previously this included a static fallback list. We now rely solely
+  // on dynamically discovered categories from the products API.
+  const [featured, setFeatured] = useState([]);
   const categoryMeta = (() => {
     const blocklist = new Set(featured.map(f => normalizeLabel(f.label)));
     const seen = new Set();
@@ -121,7 +108,6 @@ const Home = () => {
     });
     return { filtered: next, labelToRaw };
   })();
-  const filteredCats = categoryMeta.filtered;
   const labelToRaw = categoryMeta.labelToRaw;
   const goToFeatured = ({ label, query }) => {
     if (label === 'الكل') return navigate('/products');
@@ -156,8 +142,9 @@ const Home = () => {
           .sort((a, b) => b[1] - a[1])
           .map(([raw]) => ({ label: translateCategory(raw), query: raw }))
           .filter(item => item.label)
-          .slice(0, 4);
+          .slice(0, 6);
 
+        // Only use categories discovered from products (no static fallbacks).
         const seen = new Set();
         const merged = [];
         const pushUnique = (item) => {
@@ -167,14 +154,24 @@ const Home = () => {
           merged.push(item);
         };
 
-        pushUnique({ label: 'الكل', query: '' });
         dynamicFeatured.forEach(pushUnique);
-        if (merged.length < FALLBACK_FEATURED.length) {
-          FALLBACK_FEATURED.slice(1).forEach(item => {
-            if (merged.length >= FALLBACK_FEATURED.length) return;
-            pushUnique(item);
-          });
+
+        // Ensure a dynamic "All" entry is present at the start so users can
+        // always return to the full product listing. Do not re-introduce other
+        // static fallbacks — this is the only injected static item.
+        const allEntry = { label: 'الكل', query: '' };
+        const allNormalized = normalizeLabel(allEntry.label);
+        if (!merged.some(it => normalizeLabel(it.label) === allNormalized)) {
+          merged.unshift(allEntry);
+        } else {
+          // if 'الكل' exists but not at start, move it to the front
+          const idx = merged.findIndex(it => normalizeLabel(it.label) === allNormalized);
+          if (idx > 0) {
+            const [found] = merged.splice(idx, 1);
+            merged.unshift(found);
+          }
         }
+
         if (merged.length) setFeatured(merged);
       })
       .catch(() => {})
